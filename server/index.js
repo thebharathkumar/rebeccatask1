@@ -3,7 +3,21 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const xlsx = require('xlsx');
-const db = require('./db');
+const fs = require('fs');
+
+// Use JSON file for Vercel (serverless), SQLite for local
+const isVercel = process.env.VERCEL === '1';
+let db = null;
+let jsonData = [];
+
+if (!isVercel) {
+  db = require('./db');
+} else {
+  const jsonPath = path.join(__dirname, 'courses.json');
+  if (fs.existsSync(jsonPath)) {
+    jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
